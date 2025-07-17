@@ -10,6 +10,9 @@ ARG GROCY_VERSION="v4.4.2"
 # hadolint ignore=DL3003
 COPY patches/ /patches/
 
+# Copy root filesystem
+COPY rootfs /
+
 RUN \
     apk add --no-cache \
         composer=2.7.7-r0 \
@@ -73,9 +76,6 @@ RUN \
         /var/www/grocy/.vscode \
         /var/www/grocy/build_tools \
         /var/www/grocy/build.bat
-
-# Copy root filesystem
-COPY rootfs /
 
 # Build arguments
 ARG BUILD_ARCH
