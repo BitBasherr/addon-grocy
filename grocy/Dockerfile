@@ -8,6 +8,8 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # Setup base
 ARG GROCY_VERSION="v4.4.2"
 # hadolint ignore=DL3003
+COPY patches/ /patches/
+
 RUN \
     apk add --no-cache \
         composer=2.7.7-r0 \
@@ -43,6 +45,9 @@ RUN \
     \
     && composer install --no-dev \
     && yarn --production \
+    \
+    # ⬇️ Apply our patch
+    && patch controllers/StockApiController.php /patches/stockapicontroller-off.patch \
     \
     && modclean \
         --path /var/www/grocy/public \

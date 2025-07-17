@@ -1,0 +1,45 @@
+@@ if ($ProductId <= 0)
+ {
+    return $this->GenericErrorResponse($Response, 'PRODUCT_NOT_FOUND', sprintf('Product with barcode %s not found', $Args['barcode']));
+    // Try to query Open Food Facts
+    $barcode = trim($Args['barcode']);
+    $openFoodFactsData = $this->QueryOpenFoodFactsByBarcode($barcode);
+
+    if ($openFoodFactsData !== null)
+    {
+        $name = $openFoodFactsData['product']['product_name'] ?? 'Unknown Product';
+        $brands = $openFoodFactsData['product']['brands'] ?? '';
+        $categories = $openFoodFactsData['product']['categories'] ?? '';
+        $quantity = $openFoodFactsData['product']['quantity'] ?? '';
+
+        $productGroupId = null;
+        if (!empty($categories))
+        {
+            $category = explode(',', $categories)[0];
+            $productGroupId = $this->GetOrCreateProductGroupId(trim($category));
+        }
+
+        $quantityUnitId = null;
+        if (!empty($quantity))
+        {
+            $quantityUnitId = $this->GetOrCreateQuantityUnitId(trim($quantity));
+        }
+
+        $this->getDatabase()->query(
+            'INSERT INTO products (name, barcodes, description, product_group_id, qu_id_stock) VALUES (:name, :barcodes, :description, :group_id, :unit_id)',
+            [
+                'name' => $name,
+                'barcodes' => $barcode,
+                'description' => $brands,
+                'group_id' => $productGroupId,
+                'unit_id' => $quantityUnitId
+            ]
+        );
+
+        $ProductId = $this->getDatabase()->lastInsertId();
+    }
+    else
+    {
+        return $this->GenericErrorResponse($Response, 'PRODUCT_NOT_FOUND', sprintf('Product with barcode %s not found', $Args['barcode']));
+    }
+ }
