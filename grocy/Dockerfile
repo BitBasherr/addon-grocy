@@ -47,7 +47,7 @@ RUN \
     && yarn --production \
     \
     # ⬇️ Apply our patch
-    && patch controllers/StockApiController.php /patches/stockapicontroller-off.patch \
+    && patch controllers/StockApiController.php /grocy/rootfs/patches/stockapicontroller-off.patch \
     \
     && modclean \
         --path /var/www/grocy/public \
