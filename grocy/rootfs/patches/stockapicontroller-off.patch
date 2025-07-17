@@ -1,7 +1,8 @@
 @@ if ($ProductId <= 0)
  {
-    return $this->GenericErrorResponse($Response, 'PRODUCT_NOT_FOUND', sprintf('Product with barcode %s not found', $Args['barcode']));
-    // Try to query Open Food Facts
+	// Try to query Open Food Facts
+	$barcode = trim($Args['barcode']);
+	$openFoodFactsData = $this->QueryOpenFoodFactsByBarcode($barcode);    // Try to query Open Food Facts
     $barcode = trim($Args['barcode']);
     $openFoodFactsData = $this->QueryOpenFoodFactsByBarcode($barcode);
 
