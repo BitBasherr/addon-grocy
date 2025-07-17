@@ -1,0 +1,40 @@
+--- controllers/StockApiController.php.orig	2024-07-17
++++ controllers/StockApiController.php	2024-07-17
+@@ -350,7 +350,32 @@
+ 		$ProductId = $this->getDatabase()->entityExists('products', $this->getDatabase()->rawQuerySingle('SELECT id FROM products WHERE barcodes LIKE :barcode', ['barcode' => '%' . $Args['barcode'] . '%'])->id);
+
+ 		if ($ProductId <= 0)
+ 		{
+-			return $this->GenericErrorResponse($Response, 'PRODUCT_NOT_FOUND', sprintf('Product with barcode %s not found', $Args['barcode']));
++			// Try to fetch product info from OpenFoodFacts
++			$barcode = trim($Args['barcode']);
++			$offData = @file_get_contents("https://world.openfoodfacts.org/api/v0/product/{$barcode}.json");
++
++			if ($offData !== false) {
++				$offJson = json_decode($offData, true);
++
++				if (isset($offJson['status']) && $offJson['status'] == 1) {
++					$productName = $offJson['product']['product_name'] ?? 'Unknown Product';
++					$brand = $offJson['product']['brands'] ?? '';
++					$description = $offJson['product']['categories'] ?? '';
++
++					$this->getDatabase()->insert('products', [
++						'name' => $productName,
++						'description' => $description,
++						'barcodes' => $barcode,
++						'location_id' => 1,
++						'qu_id_stock' => 1,
++						'qu_id_purchase' => 1,
++						'qu_id_consume' => 1,
++						'min_stock_amount' => 0,
++						'default_best_before_days' => 0
++					]);
++
++					$ProductId = $this->getDatabase()->lastInsertId();
++				}
++			}
++
++			if ($ProductId <= 0) {
++				return $this->GenericErrorResponse($Response, 'PRODUCT_NOT_FOUND', sprintf('Product with barcode %s not found', $Args['barcode']));
++			}
+ 		}
