@@ -46,9 +46,8 @@ RUN \
     && composer install --no-dev \
     && yarn --production \
     \
-
     # ⬇️ Apply controller patch
-    && patch controllers/StockApiController.php /patches/stockapicontroller-off-structured.patch
+    && patch controllers/StockApiController.php /patches/stockapicontroller-off-structured.patch \
     \
     && modclean \
         --path /var/www/grocy/public \
