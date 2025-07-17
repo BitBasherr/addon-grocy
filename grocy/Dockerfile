@@ -8,8 +8,6 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # Setup base
 ARG GROCY_VERSION="v4.4.2"
 # hadolint ignore=DL3003
-COPY patches/ /patches/
-
 RUN \
     apk add --no-cache \
         composer=2.7.7-r0 \
@@ -45,9 +43,6 @@ RUN \
     \
     && composer install --no-dev \
     && yarn --production \
-    \
-    # ⬇️ Apply controller patch
-    && patch controllers/StockApiController.php /patches/stockapicontroller-off-structured.patch \
     \
     && modclean \
         --path /var/www/grocy/public \
@@ -105,7 +100,3 @@ LABEL \
     org.opencontainers.image.created=${BUILD_DATE} \
     org.opencontainers.image.revision=${BUILD_REF} \
     org.opencontainers.image.version=${BUILD_VERSION}
-RUN php /var/www/grocy/public/index.php migrations migrate
-
-# ⬇️ Add product_properties definitions to DB
-RUN sqlite3 /var/www/grocy/data/grocy.db < /patches/product_properties.sql
