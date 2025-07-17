@@ -4,7 +4,7 @@ FROM ${BUILD_FROM}
 
 # Set shell
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-
+ENV BUILD_CACHE_BUSTER=1
 # Setup base
 ARG GROCY_VERSION="v4.4.2"
 # hadolint ignore=DL3003
