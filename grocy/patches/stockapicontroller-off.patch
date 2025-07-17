@@ -1,3 +1,5 @@
+--- StockApiController.php.orig
++++ StockApiController.php
 @@ if ($ProductId <= 0)
  {
 	// Try to query Open Food Facts
