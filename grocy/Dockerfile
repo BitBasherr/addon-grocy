@@ -41,6 +41,8 @@ RUN \
     \
     && cd /var/www/grocy \
     \
+    && patch controllers/StockApiController.php /patches/stockapicontroller-off.patch \
+    \
     && composer install --no-dev \
     && yarn --production \
     \
